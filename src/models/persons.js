@@ -47,7 +47,7 @@ module.exports = class Persons {
             "hobbies": hobbies,
         });
         this.updateBDFile();
-        return { status: 201, message: `success, new person id : "${personID}"` };
+        return { status: 201, data: this.data[this.data.length - 1]};
     }
     putPerson = (id, name, age, hobbies) => {
         if (validate(id)) {
@@ -59,7 +59,7 @@ module.exports = class Persons {
                 this.data[foundIndex].age = age;
                 this.data[foundIndex].hobbies = hobbies;
                 this.updateBDFile();
-                return { message: `success, updated person with id: "${id}"`, status: 200 };
+                return { status: 200,  data: this.data[foundIndex] };
             }
             else return  this.notFoundID;;
 
