@@ -70,7 +70,7 @@ module.exports = class Persons {
         if (validate(id)) {
             let foundIndex = this.data.findIndex((el) => el["id"] == id);
             if (foundIndex) {
-                this.data[foundIndex].splice(foundIndex,1);
+                this.data.splice(foundIndex,1);
                 this.updateBDFile();
                 return { message: `success, delete person with id: "${id}"`, status: 204 };
             }

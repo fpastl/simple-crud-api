@@ -28,12 +28,24 @@ http.createServer(
                     });
                     request.on('end', () => {
                         const data = JSON.parse(body);
-                        
-                        let answer = PersonsBD.postPerson(data.name,data.age,data.hobbies);
+
+                        let answer = PersonsBD.postPerson(data.name, data.age, data.hobbies);
                         response.statusCode = answer.status;
                         response.statusMessage = answer.message;
                         response.end(answer.message);
                     });
+                } else if (request.method == "DELETE") {
+                    if (paths[2]) {
+                        let answer = PersonsBD.deletePerson(paths[2]);
+                        response.statusCode = answer.status;
+                        response.statusMessage = answer.message;
+                        response.end(answer.message);
+                    }else {
+                        response.statusCode = 400;
+                        response.statusMessage = 'not assigned id: "../person/{id}"';
+                        response.end('not assigned id: "../person/{id}"');
+                    }
+
                 }
             } else {
                 response.statusCode = 404;
