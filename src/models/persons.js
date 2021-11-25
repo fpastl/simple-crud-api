@@ -54,7 +54,7 @@ module.exports = class Persons {
             const notCorrect = this.checkIncorrect(name, age, hobbies);
             if (notCorrect) return notCorrect;
             let foundIndex = this.data.findIndex((el) => el["id"] == id);
-            if (foundIndex) {
+            if (foundIndex>=0) {
                 this.data[foundIndex].name = name;
                 this.data[foundIndex].age = age;
                 this.data[foundIndex].hobbies = hobbies;
@@ -69,7 +69,8 @@ module.exports = class Persons {
     deletePerson = (id) =>{
         if (validate(id)) {
             let foundIndex = this.data.findIndex((el) => el["id"] == id);
-            if (foundIndex) {
+            if (foundIndex>=0) {
+                console.log(foundIndex);
                 this.data.splice(foundIndex,1);
                 this.updateBDFile();
                 return { message: `success, delete person with id: "${id}"`, status: 204 };
