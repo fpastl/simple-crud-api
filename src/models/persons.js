@@ -2,31 +2,43 @@ const fs = require("fs");
 const { v4: uuidv4, validate } = require('uuid');
 
 module.exports = class Persons {
+
+    notFoundID = { message: "not found data with this id", status: 404 };
+    notPassedValue = (field) => { return { status: 400, message: `field "${field}" not passed` } };
+    invalidValue = (field) => { return { status: 400, message: `invalid ${field}` } };
+
+
     constructor(bdFile) {
         this.bdFile = bdFile ?? "./bd.json";
-        if (!fs.existsSync( this.bdFile)) {
-            fs.writeFileSync( this.bdFile, "[]");
+        if (!fs.existsSync(this.bdFile)) {
+            fs.writeFileSync(this.bdFile, "[]");
         }
-        this.data = JSON.parse(fs.readFileSync( this.bdFile, "utf8"));
+        this.data = JSON.parse(fs.readFileSync(this.bdFile, "utf8"));
     }
+
     getPerson = (id = false) => {
         if (id) {
             if (validate(id)) {
                 let foundData = this.data.find((el) => el["id"] == id);
                 if (foundData) return { data: foundData, status: 200 };
-                else return { message: "not found data with this id", status: 404 };
+                else return this.notFoundID;
             }
-            return { message: "invalid id", status: 400 };
+            return this.invalidValue("id");
         }
         return { data: this.data, status: 200 };
     }
-    postPerson = (name, age, hobbies) => {
+    checkIncorrect = (name, age, hobbies) => {
+        if (name === undefined) return this.notPassedValue("name");
+        if (age === undefined) return this.notPassedValue("age");
+        if (hobbies === undefined) return this.notPassedValue("hobbies");
+        if (!Array.isArray(hobbies)) return { status: 400, message: "hobbies should be an array" };
+        return false;
+    }
 
-        if (name === undefined) return { status: 400, message: "name value not passed" };
-        if (age === undefined) return { status: 400, message: "age value not passed" };
-        if (hobbies === undefined) return { status: 400, message: "hobbies value not passed" };
-        if (!Array.isArray(hobbies)) return { status: 404, message: "hobbies should be an array" };
-        
+    postPerson = (name, age, hobbies) => {
+        const notCorrect = this.checkIncorrect(name, age, hobbies);
+        if (notCorrect) return notCorrect;
+
         const personID = uuidv4();
         this.data.push({
             "id": personID,
@@ -34,7 +46,28 @@ module.exports = class Persons {
             "age": age,
             "hobbies": hobbies,
         });
-        fs.writeFileSync( this.bdFile, JSON.stringify(this.data));
-        return { status: 200, message: `success, id of new post : "${personID}"` };
+        this.updateBDFile();
+        return { status: 200, message: `success, new person id : "${personID}"` };
+    }
+    putPerson = (id, name, age, hobbies) => {
+        if (validate(id)) {
+            const notCorrect = this.checkIncorrect(name, age, hobbies);
+            if (notCorrect) return notCorrect;
+            let foundIndex = this.data.findIndex((el) => el["id"] == id);
+            if (foundIndex) {
+                this.data[foundIndex].name = name;
+                this.data[foundIndex].age = age;
+                this.data[foundIndex].hobbies = hobbies;
+                this.updateBDFile();
+                return { message: `success, updated person widt id: "${id}"`, status: 200 };
+            }
+            else return  this.notFoundID;;
+
+        }
+        return this.invalidValue("id");
+    }
+
+    updateBDFile = ()=>{
+        fs.writeFileSync(this.bdFile, JSON.stringify(this.data));
     }
 }
