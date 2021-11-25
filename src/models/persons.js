@@ -47,7 +47,7 @@ module.exports = class Persons {
             "hobbies": hobbies,
         });
         this.updateBDFile();
-        return { status: 200, message: `success, new person id : "${personID}"` };
+        return { status: 201, message: `success, new person id : "${personID}"` };
     }
     putPerson = (id, name, age, hobbies) => {
         if (validate(id)) {
@@ -59,10 +59,22 @@ module.exports = class Persons {
                 this.data[foundIndex].age = age;
                 this.data[foundIndex].hobbies = hobbies;
                 this.updateBDFile();
-                return { message: `success, updated person widt id: "${id}"`, status: 200 };
+                return { message: `success, updated person with id: "${id}"`, status: 200 };
             }
             else return  this.notFoundID;;
 
+        }
+        return this.invalidValue("id");
+    }
+    deletePerson = (id) =>{
+        if (validate(id)) {
+            let foundIndex = this.data.findIndex((el) => el["id"] == id);
+            if (foundIndex) {
+                this.data[foundIndex].splice(foundIndex,1);
+                this.updateBDFile();
+                return { message: `success, delete person with id: "${id}"`, status: 204 };
+            }
+            else return  this.notFoundID;;
         }
         return this.invalidValue("id");
     }
