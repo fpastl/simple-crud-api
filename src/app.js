@@ -2,13 +2,17 @@ const http = require("http");
 const persons = require("./models/persons");
 let PersonsBD = new persons("./bd.json");
 const notJSON = "data does not match format JSON";
+const pageNotFound = "page not found, use only /person or /person/{id}";
+const notAssignedID =  'not assigned id: "../person/{id}"';
+
 
 module.exports = http.createServer(
     (request, response) => {
         let paths = request.url.split('/');
         if (paths.length > 3) {
             response.statusCode = 404;
-            response.end("Page not found");
+            response.statusMessage = pageNotFound;
+            response.end(pageNotFound);
         } else {
             if (paths[1] == "person") {
                 if (request.method == "GET") {
@@ -76,8 +80,8 @@ module.exports = http.createServer(
                         });
                     } else {
                         response.statusCode = 404;
-                        response.statusMessage = 'not assigned id: "../person/{id}"';
-                        response.end('not assigned id: "../person/{id}"');
+                        response.statusMessage =notAssignedID;
+                        response.end(notAssignedID);
                     }
                 } else if (request.method == "DELETE") {
                     if (paths[2]) {
@@ -87,15 +91,18 @@ module.exports = http.createServer(
                         response.end(answer.message);
                     } else {
                         response.statusCode = 404;
-                        response.statusMessage = 'not assigned id: "../person/{id}"';
-                        response.end('not assigned id: "../person/{id}"');
+                        response.statusMessage = notAssignedID;
+                        response.end(notAssignedID);
                     }
                 } else {
-
+                    response.statusCode = 501;
+                    response.statusMessage = "Method not implemented, use only GET,POST,PUT,DELETE";
+                    response.end("Method not implemented, use only GET,POST,PUT,DELETE");
                 }
             } else {
                 response.statusCode = 404;
-                response.end("Page not found");
+                response.statusMessage = pageNotFound;
+                response.end(pageNotFound);
             }
         }
     }

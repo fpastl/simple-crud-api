@@ -3,7 +3,7 @@ const { v4: uuidv4, validate } = require('uuid');
 
 module.exports = class Persons {
 
-    notFoundID = { message: "not found data with this id", status: 404 };
+    notFoundID = (id) => { return { message: `not found data with id : ${id}`, status: 404 }};
     notPassedValue = (field) => { return { status: 400, message: `field "${field}" not passed` } };
     invalidValue = (field) => { return { status: 400, message: `invalid ${field}` } };
 
@@ -13,7 +13,14 @@ module.exports = class Persons {
         if (!fs.existsSync(this.bdFile)) {
             fs.writeFileSync(this.bdFile, "[]");
         }
-        this.data = JSON.parse(fs.readFileSync(this.bdFile, "utf8"));
+        try{
+            this.data = JSON.parse(fs.readFileSync(this.bdFile, "utf8"));
+        }catch{
+            fs.writeFileSync(this.bdFile, "[]");
+            console.warn("db file was wrong, it is recreated empty");
+            this.data = JSON.parse(fs.readFileSync(this.bdFile, "utf8"));
+        }
+        
     }
 
     getPerson = (id = false) => {
@@ -21,7 +28,7 @@ module.exports = class Persons {
             if (validate(id)) {
                 let foundData = this.data.find((el) => el["id"] == id);
                 if (foundData) return { data: foundData, status: 200 };
-                else return this.notFoundID;
+                else return this.notFoundID(id);
             }
             return this.invalidValue("id");
         }
@@ -61,7 +68,7 @@ module.exports = class Persons {
                 this.updateBDFile();
                 return { status: 200,  data: this.data[foundIndex] };
             }
-            else return  this.notFoundID;;
+            else return  this.notFoundID(id);
 
         }
         return this.invalidValue("id");
@@ -74,7 +81,7 @@ module.exports = class Persons {
                 this.updateBDFile();
                 return { message: `success, delete person with id: "${id}"`, status: 204 };
             }
-            else return  this.notFoundID;;
+            else return  this.notFoundID(id);
         }
         return this.invalidValue("id");
     }

@@ -198,13 +198,20 @@ describe('Сценарий 3: остальные случаи', () => {
                 expect(response.statusCode).toBe(500);
             });
     });
-    test('PГЕ-запросом с данными не соответствующими формату JSON (ожидается: код ответа 500)', async () => {
+    test('PUT-запросом с данными не соответствующими формату JSON (ожидается: код ответа 500)', async () => {
         return await request(serv)
             .put(`/person/${NIL}`)
             .send("name: name, age: age, hobbies: []")
             .set('Content-Type', 'application/json')
             .then(response => {
                 expect(response.statusCode).toBe(500);
+            });
+    });
+    test('HEAD-запросом (ожидается: код ответа 501)', async () => {
+        return await request(serv)
+            .head(`/person/`)
+            .then(response => {
+                expect(response.statusCode).toBe(501);
             });
     });
 });
