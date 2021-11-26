@@ -38,7 +38,6 @@ module.exports = http.createServer(
                             response.statusCode = 500;
                             response.statusMessage = notJSON;
                         } if (response.statusCode == 500) {
-                            console.log(response.statusCode);
                             response.end(response.statusMessage);
                         } else {
                             let answer = PersonsBD.postPerson(data.name, data.age, data.hobbies);
@@ -65,7 +64,6 @@ module.exports = http.createServer(
                                 response.statusCode = 500;
                                 response.statusMessage = notJSON;
                             } if (response.statusCode == 500) {
-                                console.log(response.statusCode);
                                 response.end(response.statusMessage);
                             } else {
                                 let answer = PersonsBD.putPerson(paths[2], data.name, data.age, data.hobbies);
