@@ -1,4 +1,5 @@
 const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 module.exports = {
   entry: {
     main: path.resolve(__dirname, './server.js'),
@@ -8,4 +9,5 @@ module.exports = {
     filename: 'api.bundle.js',
   },
   target: 'node',
+  externals: [nodeExternals()],
 };
